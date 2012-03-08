@@ -1,16 +1,33 @@
 #!/bin/bash
 APT_OPTIONS="-q -y"
+ETH1_IP="192.168.0.1"
+ETH1_NETMASK="255.255.255.0"
+ETH1_BROADCAST="192.168.0.255"
 
 function install_shorewall()
 {
     apt-get ${APT_OPTIONS} install shorewall
 }
 
+function configure_eth1()
+{
+    grep -q '^iface eth1' /etc/network/interfaces || \
+	cat >> /etc/network/interfaces <<EOF
+auto eth1
+iface eth1 inet static
+  address ${ETH1_IP}
+  netmask ${ETH1_NETMASK}
+  broadcast ${ETH1_BROADCAST}
+EOF
+
+    ifup eth1
+}
+
 BASEDIR=`dirname $0`
 
 cd ${BASEDIR}
 FUNCTION_LIST="
-        install_shorewall
+        configure_eth1
 "
 
 for name in ${FUNCTION_LIST}; do
