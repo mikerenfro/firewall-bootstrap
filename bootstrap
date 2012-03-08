@@ -1,0 +1,20 @@
+#!/bin/bash
+APT_OPTIONS="-q -y"
+
+function install_shorewall()
+{
+    apt-get ${APT_OPTIONS} install shorewall
+}
+
+BASEDIR=`dirname $0`
+
+cd ${BASEDIR}
+FUNCTION_LIST="
+        install_shorewall
+"
+
+for name in ${FUNCTION_LIST}; do
+    echo === Running ${name}\(\) ===
+    ${name}
+    echo
+done
