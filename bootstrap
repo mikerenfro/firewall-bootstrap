@@ -116,8 +116,17 @@ BASEDIR=`dirname $0`
 
 cd ${BASEDIR}
 FUNCTION_LIST="
+    configure_eth1
+    install_shorewall
+    configure_shorewall
+    install_system_database
+    install_dhcpd
+    configure_dhcpd
+    install_dns
+    configure_dns
     install_tftpd
     configure_debian_installer
+    restart_shorewall
 "
 
 for name in ${FUNCTION_LIST}; do
