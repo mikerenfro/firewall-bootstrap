@@ -1,13 +1,14 @@
 #!/bin/bash
-APT_OPTIONS="-q -y"
 ETH1_IP="192.168.0.1"
 ETH1_NETMASK="255.255.255.0"
 ETH1_BROADCAST="192.168.0.255"
 
 # Should be no need to edit past this point
+APT_OPTIONS="-q -y"
 ETH1_MAC=`ifconfig eth1 | grep HWaddr | awk '{print $NF}'`
 HOSTNAME=`hostname`
 FQDN=`hostname --fqdn`
+DOMAIN=`hostname --domain`
 
 function configure_eth1()
 {
@@ -31,24 +32,27 @@ function install_shorewall()
 function configure_shorewall()
 {
     if [ ! -f /etc/shorewall/interfaces ]; then
-    # Configure shorewall for basic masquerading of eth1 internal
-    # network to eth0 external network
+        # Configure shorewall for basic masquerading of eth1 internal
+        # network to eth0 external network
 	cp /etc/shorewall/shorewall.conf /etc/shorewall/shorewall.conf.orig
 	cp /usr/share/doc/shorewall/examples/two-interfaces/* /etc/shorewall
 	gunzip -f /etc/shorewall/shorewall.conf.gz
 
 	# Make sure dhcp is enabled on local zone
 	grep -q '^loc.*dhcp.*' /etc/shorewall/interfaces || \
-	    perl -pi.bak -E "s/loc (.*)/loc \$1,dhcp/g" /etc/shorewall/interfaces
+	    perl -pi.bak -E "s/loc (.*)/loc \$1,dhcp/g" \
+	    /etc/shorewall/interfaces
 	# Local shorewall rules separated out from default settings
 	mkdir -p /etc/shorewall/conf.d
-	echo 'SHELL for f in /etc/shorewall/conf.d/*.conf; do echo "INCLUDE $f"; done' >> /etc/shorewall/rules
-	echo '# Sample rule file for shorewall' > /etc/shorewall/conf.d/example-${FQDN}.conf
+	echo 'SHELL for f in /etc/shorewall/conf.d/*.conf; do echo "INCLUDE $f"; done' >> \
+	    /etc/shorewall/rules
+	echo '# Sample rule file for shorewall' > \
+	    /etc/shorewall/conf.d/example-${FQDN}.conf
 
 	# Shorewall starts by defualt
 	perl -pi.bak -E "s/^startup=0/startup=1/g" /etc/default/shorewall
-	perl -pi.bak -E "s/^STARTUP_ENABLED=No/STARTUP_ENABLED=Yes/g" /etc/shorewall/shorewall.conf
-	
+	perl -pi.bak -E "s/^STARTUP_ENABLED=No/STARTUP_ENABLED=Yes/g" \
+	    /etc/shorewall/shorewall.conf
     else
 	echo
 	echo Not configuring shorewall -- /etc/shorewall/interfaces exists.
@@ -57,19 +61,38 @@ function configure_shorewall()
     fi
 }
 
+function install_system_database()
+{
+    cp system_database.py /usr/local/lib/python2.6/dist-packages/
+    perl -pi.bak -E \
+	"s/__HOSTNAME__/${HOSTNAME}/g;s/__ETH1_MAC__/${ETH1_MAC}/g;s/__ETH1_IP__/${ETH1_IP}/g" \
+	/usr/local/lib/python2.6/dist-packages/system_database.py
+}
+
 function install_dhcpd()
 {
     apt-get ${APT_OPTIONS} install isc-dhcp-server
+    cp dhcp-regen /usr/local/sbin
+}
+
+function configure_dhcpd()
+{
+    echo 'INTERFACES="eth1"' > /etc/default/isc-dhcp-server
+    dhcp-regen
 }
 
 function install_dns() {
-    apt-get install maradns
+    apt-get ${APT_OPTIONS} install maradns
+    cp dns-regen /usr/local/sbin
 }
 
 function configure_dns()
 {
+    cp dhclient.conf /etc/dhcp
+    perl -pi.bak -E "s/__DOMAIN__/${DOMAIN}/g" /etc/dhcp/dhclient.conf
     # Allow DNS traffic from local zone
     echo 'DNS(ACCEPT) loc $FW' > /etc/shorewall/conf.d/dns-${FQDN}.conf
+    dns-regen
 }
 
 function restart_shorewall()
@@ -81,8 +104,12 @@ BASEDIR=`dirname $0`
 
 cd ${BASEDIR}
 FUNCTION_LIST="
-        configure_shorewall
-	restart_shorewall
+    install_system_database
+    install_dhcpd
+    configure_dhcpd
+    install_dns
+    configure_dns
+    restart_shorewall
 "
 
 for name in ${FUNCTION_LIST}; do
