@@ -1,6 +1,6 @@
 #!/bin/bash
 TFTPDIR=/srv/tftp
-MIRROR=http://ftp.cae.tntech.edu/debian
+MIRROR=http://ftp.debian.org/debian
 DISTRO=squeeze
 cd ${TFTPDIR}
 mkdir -p pxelinux.cfg

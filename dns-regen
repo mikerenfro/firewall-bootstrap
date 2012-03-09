@@ -31,7 +31,7 @@ ipv4_alias["local"] = "192.168.0.0/24"
 recursive_acl = "local,localhost"
 
 # Upstream server settings
-upstream_servers["."] = "149.149.254.4, 149.149.11.6, 149.149.11.143"
+upstream_servers["."] = "8.8.8.8"
 """
 
 DNS_DB_PREAMBLE="""
