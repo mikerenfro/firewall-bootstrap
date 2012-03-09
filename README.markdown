@@ -7,9 +7,27 @@ Currently uses:
   * isc-dhcp-server
   * tftpd-hpa
 
+Assumptions:
+
+  * Debian installed with correct hostname and domain already set
+  * eth0 is the Internet-facing interface, eth1 is the internal interface
+  * DNS, DHCP, and PXE services will be offered via eth1
+  * eth1 IP will be 192.168.0.1, netmask 255.255.255.0
+
 Installation:
 
   1. mkdir (target); cd (target)
   2. wget -O firewall-bootstrap.tgz https://github.com/mikerenfro/firewall-bootstrap/tarball/master
   3. tar --strip-components=1 -zxvpf firewall-bootstrap.tgz
-  4. ./bootstrap
+  4. Edit support files as needed. bootstrap contains eth1 IP,
+     netmask, and broadcast address. dhcp-regen contains eth1 IP, netmask,
+     and broadcast address. dns-regen contains eth1 IP and upstream DNS
+     servers. mirror-netboot contains the URL to a Debian mirror.
+  5. ./bootstrap
+
+Post-installation:
+
+  *  Verify that PXE booting works on a system connected to eth1. You
+     can configure this yourself, or else add an entry to
+     /usr/local/lib/python2.6/dist-packages/system_database.py for the client
+     system and re-run dns-regen and dhcp-regen.
