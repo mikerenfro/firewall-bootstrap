@@ -88,8 +88,10 @@ function install_dns() {
 
 function configure_dns()
 {
+    # Ensure localhost dns is used, even when dhcp is used for eth0
     cp dhclient.conf /etc/dhcp
     perl -pi.bak -E "s/__DOMAIN__/${DOMAIN}/g" /etc/dhcp/dhclient.conf
+    ifdown eth0 ; ifup eth0
     # Allow DNS traffic from local zone
     echo 'DNS(ACCEPT) loc $FW' > /etc/shorewall/conf.d/dns-${FQDN}.conf
     dns-regen
@@ -105,6 +107,8 @@ function configure_debian_installer()
     echo 'TFTP(ACCEPT) loc $FW' > /etc/shorewall/conf.d/tftpd-${FQDN}.conf
     cp mirror-netboot /usr/local/sbin
     mirror-netboot
+    # Optional: ensure that the default netboot option exists
+    ( cd /srv/tftp/pxelinux.cfg && ln -s debian-installer-i386 default )
 }
 
 function restart_shorewall()
