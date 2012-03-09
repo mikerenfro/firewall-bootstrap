@@ -1,0 +1,31 @@
+#!/bin/bash
+TFTPDIR=/srv/tftp
+MIRROR=http://ftp.cae.tntech.edu/debian
+DISTRO=squeeze
+cd ${TFTPDIR}
+mkdir -p pxelinux.cfg
+for ARCH in amd64 i386; do
+    NETBOOTURL=${MIRROR}/dists/${DISTRO}/main/installer-${ARCH}/current/images/netboot
+    (mkdir -p netboot-sources/${ARCH} && \
+	cd netboot-sources/${ARCH} && \
+	wget -nd -m ${NETBOOTURL}/netboot.tar.gz && \
+	cd ../.. && \
+	tar -zxf netboot-sources/${ARCH}/netboot.tar.gz \
+	    ./debian-installer/${ARCH} && \
+	cd pxelinux.cfg && \
+	ln -sf ../debian-installer/${ARCH}/pxelinux.cfg/default \
+	    debian-installer-${ARCH} && \
+	cd ..
+	)
+done
+
+# ${ARCH} is set to last value from for loop. This is ok, since all
+# pxelinux.0 files should be identical.
+
+ln -sf debian-installer/${ARCH}/pxelinux.0 .
+
+ln -sf debian-installer d-i
+
+# Let puppet modify the necessary syslinux menu files as needed
+# (not used in firewall-bootstrap)
+# puppetd -vt
