@@ -95,6 +95,18 @@ function configure_dns()
     dns-regen
 }
 
+function install_tftpd()
+{
+    apt-get ${APT_OPTIONS} install tftpd-hpa
+}    
+
+function configure_debian_installer()
+{
+    echo 'TFTP(ACCEPT) loc $FW' > /etc/shorewall/conf.d/tftpd-${FQDN}.conf
+    cp mirror-netboot /usr/local/sbin
+    mirror-netboot
+}
+
 function restart_shorewall()
 {
     /etc/init.d/shorewall restart
@@ -104,12 +116,8 @@ BASEDIR=`dirname $0`
 
 cd ${BASEDIR}
 FUNCTION_LIST="
-    install_system_database
-    install_dhcpd
-    configure_dhcpd
-    install_dns
-    configure_dns
-    restart_shorewall
+    install_tftpd
+    configure_debian_installer
 "
 
 for name in ${FUNCTION_LIST}; do
