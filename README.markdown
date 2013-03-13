@@ -19,10 +19,10 @@ Installation:
   1. mkdir (target); cd (target)
   2. wget -O firewall-bootstrap.tgz https://github.com/mikerenfro/firewall-bootstrap/tarball/master
   3. tar --strip-components=1 -zxvpf firewall-bootstrap.tgz
-  4. Edit support files as needed. bootstrap contains eth1 IP,
-     netmask, and broadcast address. dhcp-regen contains eth1 IP, netmask,
-     and broadcast address. dns-regen contains eth1 IP and upstream DNS
-     servers. mirror-netboot contains the URL to a Debian mirror.
+  4. Edit support files as needed. bootstrap contains an upstream DNS entry,
+     an IP range for DHCP leases, plus the IP address, netmask, network,
+     and broadcast address for eth1. mirror-netboot contains the URL to a
+     Debian mirror.     
   5. ./bootstrap
 
 Post-installation:
