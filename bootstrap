@@ -52,6 +52,8 @@ function configure_shorewall()
 	    /etc/shorewall/rules
 	echo '# Sample rule file for shorewall' > \
 	    /etc/shorewall/conf.d/example-${FQDN}.conf
+    mv /etc/shorewall/masq /etc/shorewall/masq.bak
+    echo "# Renamed masq file out of the way -- it's saved in masq.bak" > /etc/shorewall/masq
 
 	# Shorewall starts by defualt
 	perl -pi.bak -E "s/^startup=0/startup=1/g" /etc/default/shorewall
@@ -104,6 +106,7 @@ function configure_dns()
     ifdown eth0 ; ifup eth0
     # Allow DNS traffic from local zone
     echo 'DNS(ACCEPT) loc $FW' > /etc/shorewall/conf.d/dns-${FQDN}.conf
+    echo 'DNS(ACCEPT) net $FW' >> /etc/shorewall/conf.d/dns-${FQDN}.conf
     dns-regen
 }
 
