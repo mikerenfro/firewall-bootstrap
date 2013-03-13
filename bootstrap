@@ -5,6 +5,7 @@ ETH1_NETWORK="192.168.0.0"
 ETH1_BROADCAST="192.168.0.255"
 ETH1_DHCP_START="192.168.0.100"
 ETH1_DHCP_END="192.168.0.254"
+UPSTREAM_DNS="8.8.8.8"
 
 # Should be no need to edit past this point
 APT_OPTIONS="-q -y"
@@ -90,7 +91,7 @@ function configure_dhcpd()
 function install_dns() {
     apt-get ${APT_OPTIONS} install maradns
     perl -pi.bak -E \
-	"s/__ETH1_IP__/${ETH1_IP}/g;s/__ETH1_NETWORK__/${ETH1_NETWORK}/g" \
+	"s/__ETH1_IP__/${ETH1_IP}/g;s/__ETH1_NETWORK__/${ETH1_NETWORK}/g;s/__UPSTREAM_DNS__/${UPSTREAM_DNS}/g" \
     dns-regen
     cp dns-regen /usr/local/sbin
 }

@@ -31,7 +31,7 @@ ipv4_alias["local"] = "__ETH1_NETWORK__/24"
 recursive_acl = "local,localhost"
 
 # Upstream server settings
-upstream_servers["."] = "8.8.8.8"
+upstream_servers["."] = "__UPSTREAM_DNS__"
 """
 
 DNS_DB_PREAMBLE="""
