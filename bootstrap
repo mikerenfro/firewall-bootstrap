@@ -52,6 +52,14 @@ function configure_shorewall()
 	    /etc/shorewall/rules
 	echo '# Sample rule file for shorewall' > \
 	    /etc/shorewall/conf.d/example-${FQDN}.conf
+	echo 'Web(ACCEPT) $FW net ' > \
+	    /etc/shorewall/conf.d/web-client-${FQDN}.conf
+	echo 'Web(ACCEPT) $FW loc ' >> \
+	    /etc/shorewall/conf.d/web-client-${FQDN}.conf
+	echo 'ACCEPT $FW loc tcp 8140' > \
+	    /etc/shorewall/conf.d/puppet-agent-${FQDN}.conf
+	echo '# Sample rule file for shorewall' > \
+	    /etc/shorewall/conf.d/example-${FQDN}.conf
     mv /etc/shorewall/masq /etc/shorewall/masq.bak
     echo "# Renamed masq file out of the way -- it's saved in masq.bak" > /etc/shorewall/masq
 
