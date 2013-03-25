@@ -12,7 +12,7 @@ APT_OPTIONS="-q -y"
 ETH1_MAC=`ifconfig eth1 | grep HWaddr | awk '{print $NF}'`
 HOSTNAME=`hostname`
 DOMAIN=`hostname --domain`
-FQDN=${HOSTNAME}.${FQDN}
+FQDN=${HOSTNAME}.${DOMAIN}
 
 function configure_eth1()
 {
