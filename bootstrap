@@ -77,10 +77,10 @@ function configure_shorewall()
 
 function install_system_database()
 {
-    cp system_database.py /usr/local/lib/python2.6/dist-packages/
+    cp system_database.py /usr/local/lib/python2.7/dist-packages/
     perl -pi.bak -E \
 	"s/__HOSTNAME__/${HOSTNAME}/g;s/__ETH1_MAC__/${ETH1_MAC}/g;s/__ETH1_IP__/${ETH1_IP}/g" \
-	/usr/local/lib/python2.6/dist-packages/system_database.py
+	/usr/local/lib/python2.7/dist-packages/system_database.py
 }
 
 function install_dhcpd()
@@ -103,7 +103,8 @@ function install_dns() {
     perl -pi.bak -E \
 	"s/__UPSTREAM_DNS__/${UPSTREAM_DNS}/g;s/__DOMAIN__/${DOMAIN}/g;" \
     dnsmasq.conf
-    cp dnsmasq.conf /etc/dnsmasq
+    mkdir -p /etc/dnsmasq # for additional hosts file
+    cp dnsmasq.conf /etc/dnsmasq.d/
     perl -pi.bak -E \
 	"s/__UPSTREAM_DNS__/${UPSTREAM_DNS}/g" \
     dns-regen
