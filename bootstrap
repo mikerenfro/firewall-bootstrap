@@ -99,9 +99,13 @@ function configure_dhcpd()
 }
 
 function install_dns() {
-    apt-get ${APT_OPTIONS} install maradns
+    apt-get ${APT_OPTIONS} install dnsmasq
     perl -pi.bak -E \
-	"s/__ETH1_IP__/${ETH1_IP}/g;s/__ETH1_NETWORK__/${ETH1_NETWORK}/g;s/__UPSTREAM_DNS__/${UPSTREAM_DNS}/g" \
+	"s/__UPSTREAM_DNS__/${UPSTREAM_DNS}/g;s/__DOMAIN__/${DOMAIN}/g;" \
+    dnsmasq.conf
+    cp dnsmasq.conf /etc/dnsmasq
+    perl -pi.bak -E \
+	"s/__UPSTREAM_DNS__/${UPSTREAM_DNS}/g" \
     dns-regen
     cp dns-regen /usr/local/sbin
 }
