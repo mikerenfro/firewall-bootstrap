@@ -36,8 +36,8 @@ function install_shorewall()
 function configure_shorewall()
 {
     if [ ! -f /etc/shorewall/interfaces ]; then
-        # Configure shorewall for basic masquerading of eth1 internal
-        # network to eth0 external network
+    # Configure shorewall for basic masquerading of eth1 internal
+    # network to eth0 external network
 	cp /etc/shorewall/shorewall.conf /etc/shorewall/shorewall.conf.orig
 	cp /usr/share/doc/shorewall/examples/two-interfaces/* /etc/shorewall
 	gunzip -f /etc/shorewall/shorewall.conf.gz
