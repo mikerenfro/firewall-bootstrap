@@ -19,7 +19,7 @@ HOSTS_POSTAMBLE="""
 HOSTS_LINE="%s %s %s\n" # ip, fqdn, alias
 
 def main():
-    with open('/etc/dnsmasq/hosts','w') as hosts:
+    with open('/etc/dnsmasq.hosts','w') as hosts:
         hosts.write(HOSTS_PREAMBLE)
         for entry in SYSTEM_DATABASE:
             hostname, mac, ip = entry
