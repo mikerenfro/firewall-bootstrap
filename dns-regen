@@ -64,6 +64,7 @@ def main():
     global DNS_FORWARD_PREAMBLE, DNS_FORWARD_POSTAMBLE
     global DNS_REVERSE_PREAMBLE, DNS_REVERSE_POSTAMBLE
     global DNS_FOWARD_LINE, DNS_CNAME_LINE, DNS_REVERSE_LINE
+    global CONF_FILE_CONTENT
 
     forward_file = "/etc/bind/db.%s" % (DEFAULT_DOMAIN)
     serial = None
