@@ -6,6 +6,7 @@ ETH1_BROADCAST="192.168.0.255"
 ETH1_DHCP_START="192.168.0.100"
 ETH1_DHCP_END="192.168.0.254"
 ETH1_NETWORK_PREFIX=`echo ${ETH1_NETWORK} | cut -d. -f1-3` # e.g., 192.168.0
+ETH1_NETWORK_PREFIX_REVERSED=`echo ${ETH1_NETWORK_PREFIX} | awk -F. '{print $3,$2,$1}' | sed 's/ /./g'`
 UPSTREAM_DNS="8.8.8.8"
 
 # Should be no need to edit past this point
@@ -37,42 +38,43 @@ function install_shorewall()
 function configure_shorewall()
 {
     if [ ! -f /etc/shorewall/interfaces ]; then
-    # Configure shorewall for basic masquerading of eth1 internal
-    # network to eth0 external network
-	cp /etc/shorewall/shorewall.conf /etc/shorewall/shorewall.conf.orig
-	cp /usr/share/doc/shorewall/examples/two-interfaces/* /etc/shorewall
-	gunzip -f /etc/shorewall/shorewall.conf.gz
+        # Configure shorewall for basic masquerading of eth1 internal
+        # network to eth0 external network
+    	cp /etc/shorewall/shorewall.conf /etc/shorewall/shorewall.conf.orig
+    	cp /usr/share/doc/shorewall/examples/two-interfaces/* /etc/shorewall
+    	gunzip -f /etc/shorewall/shorewall.conf.gz
 
-	# Make sure dhcp is enabled on local zone
-	grep -q '^loc.*dhcp.*' /etc/shorewall/interfaces || \
-	    perl -pi.bak -E "s/loc (.*)/loc \$1,dhcp/g" \
-	    /etc/shorewall/interfaces
-	# Local shorewall rules separated out from default settings
-	mkdir -p /etc/shorewall/conf.d
-	echo 'SHELL for f in /etc/shorewall/conf.d/*.conf; do echo "INCLUDE $f"; done' >> \
-	    /etc/shorewall/rules
-	echo '# Sample rule file for shorewall' > \
-	    /etc/shorewall/conf.d/example-${FQDN}.conf
-	echo 'Web(ACCEPT) $FW net ' > \
-	    /etc/shorewall/conf.d/web-client-${FQDN}.conf
-	echo 'Web(ACCEPT) $FW loc ' >> \
-	    /etc/shorewall/conf.d/web-client-${FQDN}.conf
-	echo 'ACCEPT $FW loc tcp 8140' > \
-	    /etc/shorewall/conf.d/puppet-agent-${FQDN}.conf
-	echo '# Sample rule file for shorewall' > \
-	    /etc/shorewall/conf.d/example-${FQDN}.conf
-    mv /etc/shorewall/masq /etc/shorewall/masq.bak
-    echo "# Renamed masq file out of the way -- it's saved in masq.bak" > /etc/shorewall/masq
+    	# Make sure dhcp is enabled on local zone
+    	grep -q '^loc.*dhcp.*' /etc/shorewall/interfaces || \
+    	    perl -pi.bak -E "s/loc (.*)/loc \$1,dhcp/g" \
+    	    /etc/shorewall/interfaces
+    	# Local shorewall rules separated out from default settings
+    	mkdir -p /etc/shorewall/conf.d
+    	echo 'SHELL for f in /etc/shorewall/conf.d/*.conf; do echo "INCLUDE $f"; done' >> \
+    	    /etc/shorewall/rules
+    	echo '# Sample rule file for shorewall' > \
+    	    /etc/shorewall/conf.d/example-${FQDN}.conf
+    	echo 'Web(ACCEPT) $FW net ' > \
+    	    /etc/shorewall/conf.d/web-client-${FQDN}.conf
+    	echo 'Web(ACCEPT) $FW loc ' >> \
+    	    /etc/shorewall/conf.d/web-client-${FQDN}.conf
+    	echo 'ACCEPT $FW loc tcp 8140' > \
+    	    /etc/shorewall/conf.d/puppet-agent-${FQDN}.conf
+    	echo '# Sample rule file for shorewall' > \
+    	    /etc/shorewall/conf.d/example-${FQDN}.conf
+        mv /etc/shorewall/masq /etc/shorewall/masq.bak
+        echo "# Renamed masq file out of the way -- it's saved in masq.bak" \
+            > /etc/shorewall/masq
 
-	# Shorewall starts by defualt
-	perl -pi.bak -E "s/^startup=0/startup=1/g" /etc/default/shorewall
-	perl -pi.bak -E "s/^STARTUP_ENABLED=No/STARTUP_ENABLED=Yes/g" \
-	    /etc/shorewall/shorewall.conf
+    	# Shorewall starts by defualt
+    	perl -pi.bak -E "s/^startup=0/startup=1/g" /etc/default/shorewall
+    	perl -pi.bak -E "s/^STARTUP_ENABLED=No/STARTUP_ENABLED=Yes/g" \
+    	    /etc/shorewall/shorewall.conf
     else
-	echo
-	echo Not configuring shorewall -- /etc/shorewall/interfaces exists.
-	echo Remove it if you want to overwrite local changes.
-	echo
+    	echo
+    	echo Not configuring shorewall -- /etc/shorewall/interfaces exists.
+    	echo Remove it if you want to overwrite local changes.
+    	echo
     fi
 }
 
@@ -80,16 +82,16 @@ function install_system_database()
 {
     cp system_database.py /usr/local/lib/python2.7/dist-packages/
     perl -pi.bak -E \
-	"s/__HOSTNAME__/${HOSTNAME}/g;s/__DOMAIN__/${DOMAIN}/g;s/__ETH1_MAC__/${ETH1_MAC}/g;s/__ETH1_IP__/${ETH1_IP}/g;s/__NETWORK_PREFIX__/${ETH1_NETWORK_PREFIX/g;" \
-	/usr/local/lib/python2.7/dist-packages/system_database.py
+        "s/__HOSTNAME__/${HOSTNAME}/g;s/__DOMAIN__/${DOMAIN}/g;s/__ETH1_MAC__/${ETH1_MAC}/g;s/__ETH1_IP__/${ETH1_IP}/g;s/__NETWORK_PREFIX__/${ETH1_NETWORK_PREFIX}/g;" \
+        /usr/local/lib/python2.7/dist-packages/system_database.py
 }
 
 function install_dhcpd()
 {
     apt-get ${APT_OPTIONS} install isc-dhcp-server
     perl -pi.bak -E \
-	"s/__HOSTNAME__/${HOSTNAME}/g;s/__ETH1_MAC__/${ETH1_MAC}/g;s/__ETH1_IP__/${ETH1_IP}/g;s/__ETH1_BROADCAST__/${ETH1_BROADCAST}/g;s/__ETH1_NETWORK__/${ETH1_NETWORK}/g;s/__ETH1_NETMASK__/${ETH1_NETMASK}/g;s/__ETH1_DHCP_START__/${ETH1_DHCP_START}/g;s/__ETH1_DHCP_END__/${ETH1_DHCP_END}/g" \
-    dhcp-regen
+        "s/__HOSTNAME__/${HOSTNAME}/g;s/__ETH1_MAC__/${ETH1_MAC}/g;s/__ETH1_IP__/${ETH1_IP}/g;s/__ETH1_BROADCAST__/${ETH1_BROADCAST}/g;s/__ETH1_NETWORK__/${ETH1_NETWORK}/g;s/__ETH1_NETMASK__/${ETH1_NETMASK}/g;s/__ETH1_DHCP_START__/${ETH1_DHCP_START}/g;s/__ETH1_DHCP_END__/${ETH1_DHCP_END}/g" \
+        dhcp-regen
     cp dhcp-regen /usr/local/sbin
 }
 
@@ -102,20 +104,12 @@ function configure_dhcpd()
 function install_dns() {
     apt-get ${APT_OPTIONS} install bind9
     # mv /etc/dnsmasq.conf /etc/dnsmasq.conf.orig
-    # Secure up bind according to cymru document
-    # Add ACLs to named.conf.options
-	grep -q 'allow-transfer' /etc/bind/named.conf.options || \
-	    perl -pi.bak -E "s/^};/allow-transfer { xfer; };
-    allow-query { trusted; };
-    allow-query-cache { trusted; };
-    };/g" \
-	    /etc/bind/named.conf.options
-    perl -pi.bak -E \
-	"s/__UPSTREAM_DNS__/${UPSTREAM_DNS}/g;s/__DOMAIN__/${DOMAIN}/g;" \
-    dnsmasq.conf
-    cp dnsmasq.conf /etc/
-    perl -pi.bak -E \
-	"s/__UPSTREAM_DNS__/${UPSTREAM_DNS}/g" \
+    # TODO: secure bind according to cymru document
+    cp /etc/bind/named.conf.options /etc/bind/named.conf.options.orig
+    cp named.conf.options /etc/bind/
+    perl -pi.bak -E "s/__UPSTREAM_DNS__/${UPSTREAM_DNS}/g;" \
+        /etc/bind/named.conf.options
+    cp named.conf.local /etc/bind/
     dns-regen
     cp dns-regen /usr/local/sbin
 }
@@ -167,6 +161,11 @@ FUNCTION_LIST="
     configure_debian_installer
     restart_shorewall
 "
+
+# If Python is included by default on all Debian installs (it is at least on
+# ones where "standard system utilities" is selected in tasksel), then maybe
+# it's worth it to migrate this to Python instead of bash. Or rewrite it in
+# Perl, since that's installed regardless.
 
 for name in ${FUNCTION_LIST}; do
     echo === Running ${name}\(\) ===
