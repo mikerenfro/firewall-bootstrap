@@ -15,5 +15,15 @@ options {
 	auth-nxdomain no;    # conform to RFC1035
 	listen-on-v6 { any; };
 
+    // Cymru options: http://www.cymru.com/Documents/secure-bind-template.html
+    notify no;
+    transfer-format many-answers;
+    max-transfer-time-in 60;
+    interface-interval 0;
+    allow-transfer { xfer; };
+
+    allow-query { trusted; };
+
+    allow-query-cache { trusted; };
 };
 

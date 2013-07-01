@@ -1,6 +1,7 @@
 #!/bin/bash
 ETH1_IP="192.168.0.1"
 ETH1_NETMASK="255.255.255.0"
+ETH1_NETMASK_SHORT="24"
 ETH1_NETWORK="192.168.0.0"
 ETH1_BROADCAST="192.168.0.255"
 ETH1_DHCP_START="192.168.0.100"
@@ -82,7 +83,7 @@ function install_system_database()
 {
     cp system_database.py /usr/local/lib/python2.7/dist-packages/
     perl -pi.bak -E \
-        "s/__HOSTNAME__/${HOSTNAME}/g;s/__DOMAIN__/${DOMAIN}/g;s/__ETH1_MAC__/${ETH1_MAC}/g;s/__ETH1_IP__/${ETH1_IP}/g;s/__NETWORK_PREFIX__/${ETH1_NETWORK_PREFIX}/g;" \
+        "s/__HOSTNAME__/${HOSTNAME}/g;s/__DOMAIN__/${DOMAIN}/g;s/__ETH1_MAC__/${ETH1_MAC}/g;s/__ETH1_IP__/${ETH1_IP}/g;s/__NETWORK__/${ETH1_NETWORK}/g;s/__NETWORK_PREFIX__/${ETH1_NETWORK_PREFIX}/g;s/__NETMASK_SHORT__/${ETH1_NETMASK_SHORT}/g;" \
         /usr/local/lib/python2.7/dist-packages/system_database.py
 }
 
@@ -109,7 +110,6 @@ function install_dns() {
     cp named.conf.options /etc/bind/
     perl -pi.bak -E "s/__UPSTREAM_DNS__/${UPSTREAM_DNS}/g;" \
         /etc/bind/named.conf.options
-    dns-regen
     cp dns-regen /usr/local/sbin
 }
 
