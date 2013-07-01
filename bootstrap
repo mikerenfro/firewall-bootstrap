@@ -109,7 +109,6 @@ function install_dns() {
     cp named.conf.options /etc/bind/
     perl -pi.bak -E "s/__UPSTREAM_DNS__/${UPSTREAM_DNS}/g;" \
         /etc/bind/named.conf.options
-    cp named.conf.local /etc/bind/
     dns-regen
     cp dns-regen /usr/local/sbin
 }
