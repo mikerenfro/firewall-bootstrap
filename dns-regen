@@ -154,20 +154,20 @@ def main():
     networkFields = DEFAULT_NETWORK_PREFIX.split('.')
     networkFields.reverse()
     reverseNetwork = string.join(networkFields,'.')
-    reverse_file = "/etc/bind/db.%s" % (reverseNetwork)
-    with open(reverse_file,'w') as forward:
+    reverse_file = "/etc/bind/db.%s" % (DEFAULT_NETWORK_PREFIX)
+    with open(reverse_file,'w') as reverse:
         # print DNS_REVERSE_PREAMBLE
         DNS_REVERSE_PREAMBLE = DNS_REVERSE_PREAMBLE.replace("__N__",
                                                             newSerial)
-        forward.write(DNS_REVERSE_PREAMBLE)
+        reverse.write(DNS_REVERSE_PREAMBLE)
         for entry in SYSTEM_DATABASE:
             hostname, mac, ip = ( entry['host'],
                                   entry['mac'],
                                   entry['ip'] )
             (_, _, _, lastOctet) = ip.split('.',4)
-            forward.write(DNS_REVERSE_LINE % (lastOctet, hostname,
+            reverse.write(DNS_REVERSE_LINE % (lastOctet, hostname,
                                               DEFAULT_DOMAIN))
-        forward.write(DNS_REVERSE_POSTAMBLE)
+        reverse.write(DNS_REVERSE_POSTAMBLE)
         
     conf_file = "/etc/bind/named.conf.local"
     CONF_FILE_CONTENT = CONF_FILE_CONTENT.replace("__DOMAIN__",DEFAULT_DOMAIN)
