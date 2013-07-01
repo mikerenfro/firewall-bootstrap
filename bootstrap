@@ -128,7 +128,7 @@ function configure_dns()
 function install_tftpd()
 {
     apt-get ${APT_OPTIONS} install tftpd-hpa
-}    
+}
 
 function configure_debian_installer()
 {
