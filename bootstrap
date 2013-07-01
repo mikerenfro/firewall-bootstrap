@@ -111,6 +111,8 @@ function install_dns() {
     perl -pi.bak -E "s/__UPSTREAM_DNS__/${UPSTREAM_DNS}/g;" \
         /etc/bind/named.conf.options
     cp dns-regen /usr/local/sbin
+    perl -pi.bak -E 's#include "/etc/bind/named.conf.default-zones";#// include "/etc/bind/named.conf.default-zones";#g' \
+        /etc/bind/named.conf
 }
 
 function configure_dns()
