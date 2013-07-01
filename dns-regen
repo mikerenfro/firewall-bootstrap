@@ -65,16 +65,19 @@ def main():
     global DNS_REVERSE_PREAMBLE, DNS_REVERSE_POSTAMBLE
     global DNS_FOWARD_LINE, DNS_CNAME_LINE, DNS_REVERSE_LINE
 
-    forward_file = "/var/lib/bind/db.%s" % (DEFAULT_DOMAIN)
-    with open(forward_file,'r') as forward:
-        # find current serial number, if any
-        lines = forward.readlines()
+    forward_file = "/etc/bind/db.%s" % (DEFAULT_DOMAIN)
     serial = None
-    for line in lines:
-        if "__SERIAL__" in line:
-            # grab first field in line as current serial
-            ( serial, _, _ ) = line.split()
-            break
+    try:
+        with open(forward_file,'r') as forward:
+            # find current serial number, if any
+            lines = forward.readlines()
+        for line in lines:
+            if "__SERIAL__" in line:
+                # grab first field in line as current serial
+                ( serial, _, _ ) = line.split()
+                break
+    except IOError:
+        pass
 
     todayDate = date.today().strftime("%Y%m%d")
     # print "Today's date: %s" % (todayDate)
@@ -116,7 +119,7 @@ def main():
     networkFields = DEFAULT_NETWORK.split('.')
     networkFields.reverse()
     reverseNetwork = string.join(networkFields,'.')
-    reverse_file = "/var/lib/bind/db.%s" % (reverseNetwork)
+    reverse_file = "/etc/bind/db.%s" % (reverseNetwork)
     with open(reverse_file,'w') as forward:
         # print DNS_REVERSE_PREAMBLE
         DNS_REVERSE_PREAMBLE = DNS_REVERSE_PREAMBLE.replace("__N__",
