@@ -85,12 +85,12 @@ view "external-in" in {
     zone "__DOMAIN__" {
         type master;
         file "/etc/bind/db.__DOMAIN__";
-        allow-query { any; }
+        allow-query { any; };
         };
     zone "__NETWORK_REVERSED__.in-addr.arpa" {
         type master;
         file "/etc/bind/db.__DEFAULT_NETWORK_PREFIX__";
-        allow-query { any; }
+        allow-query { any; };
         };
 };
     
