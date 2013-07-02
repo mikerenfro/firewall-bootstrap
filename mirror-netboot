@@ -35,7 +35,7 @@ label preseed
 menu label ^Preseeded install
 menu default
 kernel debian-installer/${ARCH}/linux
-append auto url=http://`hostname --fqdn`/preseed.txt priority=critical vga=788 initrd=debian-installer/${ARCH}/initrd.gz -- quiet
+append auto locale=en_US keymap=us url=http://`hostname --fqdn`/preseed.txt priority=critical vga=788 initrd=debian-installer/${ARCH}/initrd.gz -- quiet
 EOD
     done
 fi
