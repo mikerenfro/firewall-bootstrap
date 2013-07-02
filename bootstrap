@@ -135,10 +135,17 @@ function install_tftpd()
 function configure_debian_installer()
 {
     echo 'TFTP(ACCEPT) loc $FW' > /etc/shorewall/conf.d/tftpd-${FQDN}.conf
+    # Basic preseed setup
+    apt-get install openbsd-inetd
+    apt-get install micro-httpd
+    echo 'Web(ACCEPT) loc $FW' > /etc/shorewall/conf.d/web-${FQDN}.conf
+    touch /var/www/index.html
+    cp preseed.txt puppet.conf /var/www/
     cp mirror-netboot /usr/local/sbin
     mirror-netboot
     # Optional: ensure that the default netboot option exists
     ( cd /srv/tftp/pxelinux.cfg && ln -s debian-installer-i386 default )
+    cp puppet.default /var/www/
 }
 
 function restart_shorewall()

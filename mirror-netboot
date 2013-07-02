@@ -26,6 +26,20 @@ ln -sf debian-installer/${ARCH}/pxelinux.0 .
 
 ln -sf debian-installer d-i
 
+# Create preseed files and menu entries as needed. Preseed folder also
+# needs a basic puppet.conf, normally provided in firewall-bootstrap.
+if [ -f /var/www/preseed.txt ]; then
+    for ARCH in amd64 i386; do
+        cat >> ${TFTPDIR}/debian-installer/${ARCH}/boot-screens/txt.cfg <<EOD
+label preseed
+menu label ^Preseeded install
+menu default
+kernel debian-installer/${ARCH}/linux
+append auto url=http://`hostname --fqdn`/preseed.txt priority=critical vga=788 initrd=debian-installer/${ARCH}/initrd.gz -- quiet
+EOD
+    done
+fi
+
 # Let puppet modify the necessary syslinux menu files as needed
 # (not used in firewall-bootstrap)
 # puppet agent -t
