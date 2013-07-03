@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from system_database import SYSTEM_DATABASE
+from system_database import SYSTEM_DATABASE, DEFAULT_DOMAIN
 import string, os, socket
 
 FQDN=socket.getfqdn()
@@ -29,16 +29,18 @@ DHCP_HOST_LINE="""host %s
     filename "/pxelinux.0"; }
 """
 
-DHCP_PREAMBLE = DHCP_PREAMBLE.replace('~LOCAL_DOMAIN~',LOCAL_DOMAIN)
+DHCP_PREAMBLE = DHCP_PREAMBLE.replace('~LOCAL_DOMAIN~',DEFAULT_DOMAIN)
 
 def main():
     with open('/etc/dhcp/dhcpd.conf','w') as dhcpd_conf:
         dhcpd_conf.write(DHCP_PREAMBLE)
         for entry in SYSTEM_DATABASE:
-            hostname, mac, ip = entry
+            hostname, mac, ip = ( entry['host'],
+                                  entry['mac'],
+                                  entry['ip'] )
             dhcpd_conf.write(DHCP_HOST_LINE % (hostname, mac, ip))
 
-    os.system("/etc/init.d/isc-dhcp-server restart")
+    os.system("service isc-dhcp-server restart")
 
 if __name__ == "__main__":
     main()
