@@ -20,6 +20,5 @@ d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 d-i partman/confirm_nooverwrite boolean true
 tasksel tasksel/first multiselect standard, ssh-server
-d-i preseed/late_command string wget -O /target/root/puppet.deb http://apt.puppetlabs.com/puppetlabs-release-wheezy.deb ; in-target dpkg -i /root/puppet.deb ; in-target apt-get update ; in-target apt-get -y install puppet ; wget -O /target/etc/puppet/puppet.conf http://FQDN/puppet.conf
-
+d-i preseed/late_command string wget -O /target/root/puppet.deb http://apt.puppetlabs.com/puppetlabs-release-wheezy.deb ; in-target dpkg -i /root/puppet.deb ; in-target apt-get update ; in-target apt-get -y install puppet ; wget -O /target/etc/puppet/puppet.conf http://FQDN/puppet.conf ; wget -O /target/etc/default/puppet http://FQDN/puppet.default
 d-i finish-install/reboot_in_progress note
