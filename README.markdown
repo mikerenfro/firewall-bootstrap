@@ -10,7 +10,8 @@ Currently uses:
 
 Assumptions:
 
-  * Debian installed with correct hostname and domain already set
+  * Debian 7.1 (wheezy) installed with correct hostname and domain already
+    set
   * eth0 is the Internet-facing interface, eth1 is the internal interface
   * DNS, DHCP, and PXE services will be offered via eth1
   * eth1 IP will default to 192.168.0.1 on network 192.168.0.0/24 (see step
@@ -19,7 +20,7 @@ Assumptions:
 Installation:
 
   1. mkdir (target); cd (target)
-  2. wget -O firewall-bootstrap.tgz https://github.com/mikerenfro/firewall-bootstrap/tarball/wheezy
+  2. wget -O firewall-bootstrap.tgz https://github.com/mikerenfro/firewall-bootstrap/tarball/master
   3. tar --strip-components=1 -zxvpf firewall-bootstrap.tgz
   4. Edit support files as needed. bootstrap contains an upstream DNS entry,
      an IP range for DHCP leases, plus the IP address and CIDR netmask for
