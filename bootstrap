@@ -105,12 +105,24 @@ function install_dhcpd()
         "s/__HOSTNAME__/${HOSTNAME}/g;s/__ETH1_MAC__/${ETH1_MAC}/g;s/__ETH1_IP__/${ETH1_IP}/g;s/__ETH1_BROADCAST__/${ETH1_BROADCAST}/g;s/__ETH1_NETWORK__/${ETH1_NETWORK}/g;s/__ETH1_NETMASK__/${ETH1_NETMASK}/g;s/__ETH1_DHCP_START__/${ETH1_DHCP_START}/g;s/__ETH1_DHCP_END__/${ETH1_DHCP_END}/g" \
         dhcp-regen
     cp dhcp-regen /usr/local/sbin
+    
+    echo ""
+    echo "It's ok if isc-dhcp-server failed to start just now."
+    echo "It's not set up correctly yet."
+    echo ""
 }
 
 function configure_dhcpd()
 {
+    echo ""
+    echo "It's ok if isc-dhcp-server fails to stop just below."
+    echo ""
     echo 'INTERFACES="eth1"' > /etc/default/isc-dhcp-server
     dhcp-regen
+
+    echo ""
+    echo "But it should have started correctly just now."
+    echo ""
 }
 
 function install_dns() {
