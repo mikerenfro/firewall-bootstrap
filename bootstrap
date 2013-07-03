@@ -24,6 +24,8 @@ function get_netvalues() {
     ETH1_BROADCAST=`./netcalc.py broadcast ${ETH1_IP}/${ETH1_NETMASK_SHORT}`
     ETH1_NETWORK_PREFIX=`echo ${ETH1_NETWORK} | cut -d. -f1-3` # e.g., 192.168.0
     ETH1_NETWORK_PREFIX_REVERSED=`echo ${ETH1_NETWORK_PREFIX} | awk -F. '{print $3,$2,$1}' | sed 's/ /./g'`
+    ETH1_DHCP_START="${ETH1_NETWORK_PREFIX}.${ETH1_DHCP_START}"
+    ETH1_DHCP_END="${ETH1_NETWORK_PREFIX}.${ETH1_DHCP_END}"
 }
 
 function configure_eth1()
@@ -145,8 +147,8 @@ function configure_debian_installer()
 {
     echo 'TFTP(ACCEPT) loc $FW' > /etc/shorewall/conf.d/tftpd-${FQDN}.conf
     # Basic preseed setup
-    apt-get install openbsd-inetd
-    apt-get install micro-httpd
+    apt-get ${APT_OPTIONS} install openbsd-inetd
+    apt-get ${APT_OPTIONS} install micro-httpd
     echo 'Web(ACCEPT) loc $FW' > /etc/shorewall/conf.d/web-${FQDN}.conf
     touch /var/www/index.html
     cp preseed.txt puppet.conf /var/www/
