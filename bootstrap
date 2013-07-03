@@ -152,6 +152,7 @@ function configure_debian_installer()
     echo 'Web(ACCEPT) loc $FW' > /etc/shorewall/conf.d/web-${FQDN}.conf
     touch /var/www/index.html
     cp preseed.txt puppet.conf /var/www/
+    perl -pi.bak -E "s/__FQDN__/${FQDN}/g" /var/www/preseed.txt
     cp mirror-netboot /usr/local/sbin
     mirror-netboot
     # Optional: ensure that the default netboot option exists
