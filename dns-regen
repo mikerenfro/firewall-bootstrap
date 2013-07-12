@@ -60,7 +60,9 @@ CONF_FILE_CONTENT="""
 // See also: http://www.cymru.com/Documents/secure-bind-template.html
 
 acl "xfer" { none; };
-acl "trusted" { localhost; __DEFAULT_NETWORK__/__NETMASK_SHORT__; };
+acl "trusted" { localhost;
+                __LOC_NETWORK__/__LOC_NETMASK_SHORT__;
+                __DMZ_NETWORK__/__DMZ_NETMASK_SHORT__; };
 
 view "internal-in" in {
     match-clients { trusted; }; 
@@ -74,7 +76,7 @@ view "internal-in" in {
         };
     zone "__NETWORK_REVERSED__.in-addr.arpa" {
         type master;
-        file "/etc/bind/db.__DEFAULT_NETWORK_PREFIX__";
+        file "/etc/bind/db.__LOC_NETWORK_PREFIX__";
         };
     include "/etc/bind/named.conf.default-zones";
 };
@@ -96,11 +98,10 @@ view "external-in" in {
         };
     zone "__NETWORK_REVERSED__.in-addr.arpa" {
         type master;
-        file "/etc/bind/db.__DEFAULT_NETWORK_PREFIX__";
+        file "/etc/bind/db.__LOC_NETWORK_PREFIX__";
         allow-query { any; };
         };
-};
-    
+}; 
 """
 
 def main():
