@@ -2,7 +2,7 @@
 
 # See http://www.cymru.com/Documents/secure-bind-template.html for more
 
-from system_database import SYSTEM_DATABASE, DEFAULT_DOMAIN, DEFAULT_NETWORK_PREFIX, DEFAULT_NETWORK, DEFAULT_NETMASK_SHORT
+from system_database import SYSTEM_DATABASE_LOC, SYSTEM_DATABASE_DMZ, DEFAULT_DOMAIN, DEFAULT_NETWORK_PREFIX, DEFAULT_NETWORK, DEFAULT_NETMASK_SHORT
 import string, os, socket
 from datetime import date
 
@@ -150,7 +150,15 @@ def main():
         DNS_FORWARD_PREAMBLE = DNS_FORWARD_PREAMBLE.replace("__N__",
                                                             newSerial)
         forward.write(DNS_FORWARD_PREAMBLE)
-        for entry in SYSTEM_DATABASE:
+        for entry in SYSTEM_DATABASE_LOC:
+            hostname, mac, ip = ( entry['host'],
+                                  entry['mac'],
+                                  entry['ip'] )
+            forward.write(DNS_FORWARD_LINE % (hostname, ip))
+            if 'aliases' in entry:
+                for alias in entry['aliases']:
+                    forward.write(DNS_CNAME_LINE % (alias, hostname))
+        for entry in SYSTEM_DATABASE_DMZ:
             hostname, mac, ip = ( entry['host'],
                                   entry['mac'],
                                   entry['ip'] )
@@ -170,7 +178,14 @@ def main():
         DNS_REVERSE_PREAMBLE = DNS_REVERSE_PREAMBLE.replace("__N__",
                                                             newSerial)
         reverse.write(DNS_REVERSE_PREAMBLE)
-        for entry in SYSTEM_DATABASE:
+        for entry in SYSTEM_DATABASE_LOC:
+            hostname, mac, ip = ( entry['host'],
+                                  entry['mac'],
+                                  entry['ip'] )
+            (_, _, _, lastOctet) = ip.split('.',4)
+            reverse.write(DNS_REVERSE_LINE % (lastOctet, hostname,
+                                              DEFAULT_DOMAIN))
+        for entry in SYSTEM_DATABASE_DMZ:
             hostname, mac, ip = ( entry['host'],
                                   entry['mac'],
                                   entry['ip'] )
