@@ -235,6 +235,7 @@ FUNCTION_LIST="
     install_netaddr
     get_netvalues
     configure_eth1
+    configure_eth2
     install_shorewall
     configure_shorewall
     install_system_database
