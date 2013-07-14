@@ -2,7 +2,11 @@
 
 # See http://www.cymru.com/Documents/secure-bind-template.html for more
 
-from system_database import SYSTEM_DATABASE_LOC, SYSTEM_DATABASE_DMZ, DEFAULT_DOMAIN, DEFAULT_NETWORK_PREFIX, DEFAULT_NETWORK, DEFAULT_NETMASK_SHORT
+from system_database import SYSTEM_DATABASE_LOC, SYSTEM_DATABASE_DMZ
+from system_database import DEFAULT_DOMAIN, LOC_NETWORK_PREFIX
+from system_database import LOC_NETWORK, LOC_NETMASK_SHORT
+from system_database import DMZ_NETWORK_PREFIX
+from system_database import DMZ_NETWORK, DMZ_NETMASK_SHORT
 import string, os, socket
 from datetime import date
 
@@ -169,6 +173,11 @@ def main():
 
         forward.write(DNS_FORWARD_POSTAMBLE)
 
+    # LOC_CIDR="%s/%s" % (LOC_NETWORK, LOC_NETMASK_SHORT)
+    # DMZ_CIDR="%s/%s" % (DMZ_NETWORK, DMZ_NETMASK_SHORT)
+    # TOTAL_CIDR = str(netaddr.cidr_merge([LOC_CIDR, DMZ_CIDR])[0])
+    # DEFAULT_NETWORK_PREFIX = TOTAL_CIDR.split('.')[0:2]
+    DEFAULT_NETWORK_PREFIX = DMZ_NETWORK_PREFIX
     networkFields = DEFAULT_NETWORK_PREFIX.split('.')
     networkFields.reverse()
     reverseNetwork = string.join(networkFields,'.')
