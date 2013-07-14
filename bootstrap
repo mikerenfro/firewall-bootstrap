@@ -129,6 +129,8 @@ function install_system_database()
         s/__LOC_NETWORK__/${ETH1_NETWORK}/g;
         s/__LOC_NETWORK_PREFIX__/${ETH1_NETWORK_PREFIX}/g;
         s/__LOC_NETMASK_SHORT__/${ETH1_NETMASK_SHORT}/g;
+        s/__ETH2_MAC__/${ETH2_MAC}/g;
+        s/__ETH2_IP__/${ETH2_IP}/g;
         s/__DMZ_NETWORK__/${ETH2_NETWORK}/g;
         s/__DMZ_NETWORK_PREFIX__/${ETH2_NETWORK_PREFIX}/g;
         s/__DMZ_NETMASK_SHORT__/${ETH2_NETMASK_SHORT}/g;" \
