@@ -178,7 +178,7 @@ def main():
     DMZ_CIDR="%s/%s" % (DMZ_NETWORK, DMZ_NETMASK_SHORT)
     TOTAL_CIDR = str(netaddr.cidr_merge([LOC_CIDR, DMZ_CIDR])[0])
     (DEFAULT_NETWORK, DEFAULT_NETMASK_SHORT) = TOTAL_CIDR.split('/')
-    DEFAULT_NETWORK_PREFIX = DEFAULT_NETWORK.split('.')[0:2]
+    DEFAULT_NETWORK_PREFIX = string.join(DEFAULT_NETWORK.split('.')[0:3],'.')
     networkFields = DEFAULT_NETWORK_PREFIX.split('.')
     networkFields.reverse()
     reverseNetwork = string.join(networkFields,'.')
