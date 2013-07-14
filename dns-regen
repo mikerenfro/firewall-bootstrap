@@ -81,7 +81,7 @@ view "internal-in" in {
         };
     zone "__NETWORK_REVERSED__.in-addr.arpa" {
         type master;
-        file "/etc/bind/db.__LOC_NETWORK_PREFIX__";
+        file "/etc/bind/db.__DEFAULT_NETWORK_PREFIX__";
         };
     include "/etc/bind/named.conf.default-zones";
 };
@@ -174,7 +174,11 @@ def main():
 
         forward.write(DNS_FORWARD_POSTAMBLE)
 
-    DEFAULT_NETWORK_PREFIX = DMZ_NETWORK_PREFIX
+    LOC_CIDR="%s/%s" % (LOC_NETWORK, LOC_NETMASK_SHORT)
+    DMZ_CIDR="%s/%s" % (DMZ_NETWORK, DMZ_NETMASK_SHORT)
+    TOTAL_CIDR = str(netaddr.cidr_merge([LOC_CIDR, DMZ_CIDR])[0])
+    (DEFAULT_NETWORK, DEFAULT_NETMASK_SHORT) = TOTAL_CIDR.split('/')
+    DEFAULT_NETWORK_PREFIX = DEFAULT_NETWORK.split('.')[0:2]
     networkFields = DEFAULT_NETWORK_PREFIX.split('.')
     networkFields.reverse()
     reverseNetwork = string.join(networkFields,'.')
@@ -201,10 +205,6 @@ def main():
         reverse.write(DNS_REVERSE_POSTAMBLE)
         
     conf_file = "/etc/bind/named.conf.local"
-    LOC_CIDR="%s/%s" % (LOC_NETWORK, LOC_NETMASK_SHORT)
-    DMZ_CIDR="%s/%s" % (DMZ_NETWORK, DMZ_NETMASK_SHORT)
-    TOTAL_CIDR = str(netaddr.cidr_merge([LOC_CIDR, DMZ_CIDR])[0])
-    (DEFAULT_NETWORK, DEFAULT_NETMASK_SHORT) = TOTAL_CIDR.split('/')
     CONF_FILE_CONTENT = CONF_FILE_CONTENT.replace("__DOMAIN__",DEFAULT_DOMAIN)
     CONF_FILE_CONTENT = CONF_FILE_CONTENT.replace("__LOC_NETWORK__",LOC_NETWORK)
     CONF_FILE_CONTENT = CONF_FILE_CONTENT.replace("__LOC_NETMASK_SHORT__",LOC_NETMASK_SHORT)
