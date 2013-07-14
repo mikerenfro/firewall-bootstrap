@@ -17,7 +17,7 @@ SYSTEM_DATABASE_LOC = [
     ]
 
 SYSTEM_DATABASE_DMZ = [
-    { 'host':    '__HOSTNAME__',
+    { 'host':    '__HOSTNAME__-dmz',
       'mac':     '__ETH2_MAC__',
       'ip':      '__ETH2_IP__',
       'aliases': ('ns1',),
