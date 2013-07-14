@@ -103,7 +103,7 @@ view "external-in" in {
         };
     zone "__NETWORK_REVERSED__.in-addr.arpa" {
         type master;
-        file "/etc/bind/db.__LOC_NETWORK_PREFIX__";
+        file "/etc/bind/db.__DEFAULT_NETWORK_PREFIX__";
         allow-query { any; };
         };
 }; 
