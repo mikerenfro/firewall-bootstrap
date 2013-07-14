@@ -9,6 +9,7 @@ from system_database import DMZ_NETWORK_PREFIX
 from system_database import DMZ_NETWORK, DMZ_NETMASK_SHORT
 import string, os, socket
 from datetime import date
+import netaddr
 
 FQDN=socket.getfqdn()
 LOCAL_DOMAIN=string.join(string.split(FQDN,'.')[1:],'.')
