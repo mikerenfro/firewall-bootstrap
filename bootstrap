@@ -106,7 +106,7 @@ function configure_shorewall()
         echo "# Renamed masq file out of the way -- it's saved in masq.bak" \
             > /etc/shorewall/masq
 
-    	# Shorewall starts by defualt
+    	# Shorewall starts by default
     	perl -pi.bak -E "s/^startup=0/startup=1/g" /etc/default/shorewall
     	perl -pi.bak -E "s/^STARTUP_ENABLED=No/STARTUP_ENABLED=Yes/g" \
     	    /etc/shorewall/shorewall.conf
@@ -158,7 +158,7 @@ function install_dhcpd()
         s/__ETH2_DHCP_END__/${ETH2_DHCP_END}/g;" \
         dhcp-regen
     cp dhcp-regen /usr/local/sbin
-    
+
     echo ""
     echo "It's ok if isc-dhcp-server failed to start just now."
     echo "It's not set up correctly yet."

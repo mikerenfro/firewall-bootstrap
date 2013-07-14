@@ -173,10 +173,6 @@ def main():
 
         forward.write(DNS_FORWARD_POSTAMBLE)
 
-    # LOC_CIDR="%s/%s" % (LOC_NETWORK, LOC_NETMASK_SHORT)
-    # DMZ_CIDR="%s/%s" % (DMZ_NETWORK, DMZ_NETMASK_SHORT)
-    # TOTAL_CIDR = str(netaddr.cidr_merge([LOC_CIDR, DMZ_CIDR])[0])
-    # DEFAULT_NETWORK_PREFIX = TOTAL_CIDR.split('.')[0:2]
     DEFAULT_NETWORK_PREFIX = DMZ_NETWORK_PREFIX
     networkFields = DEFAULT_NETWORK_PREFIX.split('.')
     networkFields.reverse()
@@ -204,6 +200,10 @@ def main():
         reverse.write(DNS_REVERSE_POSTAMBLE)
         
     conf_file = "/etc/bind/named.conf.local"
+    LOC_CIDR="%s/%s" % (LOC_NETWORK, LOC_NETMASK_SHORT)
+    DMZ_CIDR="%s/%s" % (DMZ_NETWORK, DMZ_NETMASK_SHORT)
+    TOTAL_CIDR = str(netaddr.cidr_merge([LOC_CIDR, DMZ_CIDR])[0])
+    DEFAULT_NETWORK = TOTAL_CIDR.split('/')[0]
     CONF_FILE_CONTENT = CONF_FILE_CONTENT.replace("__DOMAIN__",DEFAULT_DOMAIN)
     CONF_FILE_CONTENT = CONF_FILE_CONTENT.replace("__NETWORK_REVERSED__",reverseNetwork)
     CONF_FILE_CONTENT = CONF_FILE_CONTENT.replace("__DEFAULT_NETWORK_PREFIX__",DEFAULT_NETWORK_PREFIX)
