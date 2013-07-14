@@ -199,6 +199,7 @@ function configure_dns()
     ifdown eth0 ; ifup eth0
     # Allow DNS traffic from local zone
     echo 'DNS(ACCEPT) loc $FW' > /etc/shorewall/conf.d/dns-${FQDN}.conf
+    echo 'DNS(ACCEPT) dmz $FW' >> /etc/shorewall/conf.d/dns-${FQDN}.conf
     echo 'DNS(ACCEPT) net $FW' >> /etc/shorewall/conf.d/dns-${FQDN}.conf
     dns-regen
 }
