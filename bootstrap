@@ -146,7 +146,7 @@ function install_dhcpd()
         s/__ETH1_NETWORK__/${ETH1_NETWORK}/g;
         s/__ETH1_NETMASK__/${ETH1_NETMASK}/g;
         s/__ETH1_DHCP_START__/${ETH1_DHCP_START}/g;
-        s/__ETH1_DHCP_END__/${ETH1_DHCP_END}/g
+        s/__ETH1_DHCP_END__/${ETH1_DHCP_END}/g;
         s/__ETH2_MAC__/${ETH2_MAC}/g;
         s/__ETH2_IP__/${ETH2_IP}/g;
         s/__ETH2_BROADCAST__/${ETH2_BROADCAST}/g;
