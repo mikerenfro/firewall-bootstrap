@@ -1,14 +1,18 @@
 #!/bin/bash
 ETH1_IP="192.168.0.1"
-ETH1_NETMASK_SHORT="24" # CIDR notation: this has not been tested with values
-                        # other than 24.
+ETH1_NETMASK_SHORT="25" # CIDR notation
 ETH1_DHCP_START="100"
-ETH1_DHCP_END="254"
+ETH1_DHCP_END="126"
+ETH2_IP="192.168.0.129"
+ETH2_NETMASK_SHORT="25" # CIDR notation
+ETH2_DHCP_START="200"
+ETH2_DHCP_END="254"
 UPSTREAM_DNS="8.8.8.8"
 
 # Should be no need to edit past this point
 APT_OPTIONS="-q -y"
 ETH1_MAC=`ifconfig eth1 | grep HWaddr | awk '{print $NF}'`
+ETH2_MAC=`ifconfig eth2 | grep HWaddr | awk '{print $NF}'`
 HOSTNAME=`hostname`
 DOMAIN=`hostname --domain`
 FQDN=${HOSTNAME}.${DOMAIN}
@@ -26,6 +30,13 @@ function get_netvalues() {
     ETH1_NETWORK_PREFIX_REVERSED=`echo ${ETH1_NETWORK_PREFIX} | awk -F. '{print $3,$2,$1}' | sed 's/ /./g'`
     ETH1_DHCP_START="${ETH1_NETWORK_PREFIX}.${ETH1_DHCP_START}"
     ETH1_DHCP_END="${ETH1_NETWORK_PREFIX}.${ETH1_DHCP_END}"
+    ETH2_NETMASK=`./netcalc.py netmask ${ETH2_IP}/${ETH2_NETMASK_SHORT}`
+    ETH2_NETWORK=`./netcalc.py network ${ETH2_IP}/${ETH2_NETMASK_SHORT}`
+    ETH2_BROADCAST=`./netcalc.py broadcast ${ETH2_IP}/${ETH2_NETMASK_SHORT}`
+    ETH2_NETWORK_PREFIX=`echo ${ETH2_NETWORK} | cut -d. -f1-3` # e.g., 192.168.0
+    ETH2_NETWORK_PREFIX_REVERSED=`echo ${ETH2_NETWORK_PREFIX} | awk -F. '{print $3,$2,$1}' | sed 's/ /./g'`
+    ETH2_DHCP_START="${ETH2_NETWORK_PREFIX}.${ETH2_DHCP_START}"
+    ETH2_DHCP_END="${ETH2_NETWORK_PREFIX}.${ETH2_DHCP_END}"
 }
 
 function configure_eth1()
@@ -42,6 +53,20 @@ EOF
     ifup eth1
 }
 
+function configure_eth2()
+{
+    grep -q '^iface eth2' /etc/network/interfaces || \
+	cat >> /etc/network/interfaces <<EOF
+auto eth2
+iface eth2 inet static
+  address ${ETH2_IP}
+  netmask ${ETH2_NETMASK}
+  broadcast ${ETH2_BROADCAST}
+EOF
+
+    ifup eth2
+}
+
 function install_shorewall()
 {
     apt-get ${APT_OPTIONS} install shorewall
@@ -50,15 +75,16 @@ function install_shorewall()
 function configure_shorewall()
 {
     if [ ! -f /etc/shorewall/interfaces ]; then
-        # Configure shorewall for basic masquerading of eth1 internal
-        # network to eth0 external network
     	cp /etc/shorewall/shorewall.conf /etc/shorewall/shorewall.conf.orig
-    	cp /usr/share/doc/shorewall/examples/two-interfaces/* /etc/shorewall
+    	cp /usr/share/doc/shorewall/examples/three-interfaces/* /etc/shorewall
     	gunzip -f /etc/shorewall/shorewall.conf.gz
 
-    	# Make sure dhcp is enabled on local zone
+    	# Make sure dhcp is enabled on local and dmz zones
     	grep -q '^loc.*dhcp.*' /etc/shorewall/interfaces || \
-    	    perl -pi.bak -E "s/loc (.*)/loc \$1,dhcp/g" \
+    	    perl -pi.bak.bak -E "s/loc (.*)/loc \$1,dhcp/g" \
+    	    /etc/shorewall/interfaces
+    	grep -q '^dmz.*dhcp.*' /etc/shorewall/interfaces || \
+    	    perl -pi.bak -E "s/dmz (.*)/dmz \$1,dhcp/g" \
     	    /etc/shorewall/interfaces
     	# Local shorewall rules separated out from default settings
     	mkdir -p /etc/shorewall/conf.d
@@ -70,7 +96,9 @@ function configure_shorewall()
     	    /etc/shorewall/conf.d/web-client-${FQDN}.conf
     	echo 'Web(ACCEPT) $FW loc ' >> \
     	    /etc/shorewall/conf.d/web-client-${FQDN}.conf
-    	echo 'ACCEPT $FW loc tcp 8140' > \
+    	echo 'Web(ACCEPT) $FW dmz ' >> \
+    	    /etc/shorewall/conf.d/web-client-${FQDN}.conf
+    	echo 'ACCEPT $FW dmz tcp 8140' > \
     	    /etc/shorewall/conf.d/puppet-agent-${FQDN}.conf
     	echo '# Sample rule file for shorewall' > \
     	    /etc/shorewall/conf.d/example-${FQDN}.conf
@@ -78,7 +106,7 @@ function configure_shorewall()
         echo "# Renamed masq file out of the way -- it's saved in masq.bak" \
             > /etc/shorewall/masq
 
-    	# Shorewall starts by defualt
+    	# Shorewall starts by default
     	perl -pi.bak -E "s/^startup=0/startup=1/g" /etc/default/shorewall
     	perl -pi.bak -E "s/^STARTUP_ENABLED=No/STARTUP_ENABLED=Yes/g" \
     	    /etc/shorewall/shorewall.conf
@@ -94,7 +122,18 @@ function install_system_database()
 {
     cp system_database.py /usr/local/lib/python2.7/dist-packages/
     perl -pi.bak -E \
-        "s/__HOSTNAME__/${HOSTNAME}/g;s/__DOMAIN__/${DOMAIN}/g;s/__ETH1_MAC__/${ETH1_MAC}/g;s/__ETH1_IP__/${ETH1_IP}/g;s/__NETWORK__/${ETH1_NETWORK}/g;s/__NETWORK_PREFIX__/${ETH1_NETWORK_PREFIX}/g;s/__NETMASK_SHORT__/${ETH1_NETMASK_SHORT}/g;" \
+        "s/__HOSTNAME__/${HOSTNAME}/g;
+        s/__DOMAIN__/${DOMAIN}/g;
+        s/__ETH1_MAC__/${ETH1_MAC}/g;
+        s/__ETH1_IP__/${ETH1_IP}/g;
+        s/__LOC_NETWORK__/${ETH1_NETWORK}/g;
+        s/__LOC_NETWORK_PREFIX__/${ETH1_NETWORK_PREFIX}/g;
+        s/__LOC_NETMASK_SHORT__/${ETH1_NETMASK_SHORT}/g;
+        s/__ETH2_MAC__/${ETH2_MAC}/g;
+        s/__ETH2_IP__/${ETH2_IP}/g;
+        s/__DMZ_NETWORK__/${ETH2_NETWORK}/g;
+        s/__DMZ_NETWORK_PREFIX__/${ETH2_NETWORK_PREFIX}/g;
+        s/__DMZ_NETMASK_SHORT__/${ETH2_NETMASK_SHORT}/g;" \
         /usr/local/lib/python2.7/dist-packages/system_database.py
 }
 
@@ -102,10 +141,24 @@ function install_dhcpd()
 {
     apt-get ${APT_OPTIONS} install isc-dhcp-server
     perl -pi.bak -E \
-        "s/__HOSTNAME__/${HOSTNAME}/g;s/__ETH1_MAC__/${ETH1_MAC}/g;s/__ETH1_IP__/${ETH1_IP}/g;s/__ETH1_BROADCAST__/${ETH1_BROADCAST}/g;s/__ETH1_NETWORK__/${ETH1_NETWORK}/g;s/__ETH1_NETMASK__/${ETH1_NETMASK}/g;s/__ETH1_DHCP_START__/${ETH1_DHCP_START}/g;s/__ETH1_DHCP_END__/${ETH1_DHCP_END}/g" \
+        "s/__HOSTNAME__/${HOSTNAME}/g;
+        s/__ETH1_MAC__/${ETH1_MAC}/g;
+        s/__ETH1_IP__/${ETH1_IP}/g;
+        s/__ETH1_BROADCAST__/${ETH1_BROADCAST}/g;
+        s/__ETH1_NETWORK__/${ETH1_NETWORK}/g;
+        s/__ETH1_NETMASK__/${ETH1_NETMASK}/g;
+        s/__ETH1_DHCP_START__/${ETH1_DHCP_START}/g;
+        s/__ETH1_DHCP_END__/${ETH1_DHCP_END}/g;
+        s/__ETH2_MAC__/${ETH2_MAC}/g;
+        s/__ETH2_IP__/${ETH2_IP}/g;
+        s/__ETH2_BROADCAST__/${ETH2_BROADCAST}/g;
+        s/__ETH2_NETWORK__/${ETH2_NETWORK}/g;
+        s/__ETH2_NETMASK__/${ETH2_NETMASK}/g;
+        s/__ETH2_DHCP_START__/${ETH2_DHCP_START}/g;
+        s/__ETH2_DHCP_END__/${ETH2_DHCP_END}/g;" \
         dhcp-regen
     cp dhcp-regen /usr/local/sbin
-    
+
     echo ""
     echo "It's ok if isc-dhcp-server failed to start just now."
     echo "It's not set up correctly yet."
@@ -117,7 +170,7 @@ function configure_dhcpd()
     echo ""
     echo "It's ok if isc-dhcp-server fails to stop just below."
     echo ""
-    echo 'INTERFACES="eth1"' > /etc/default/isc-dhcp-server
+    echo 'INTERFACES="eth1 eth2"' > /etc/default/isc-dhcp-server
     dhcp-regen
 
     echo ""
@@ -146,6 +199,7 @@ function configure_dns()
     ifdown eth0 ; ifup eth0
     # Allow DNS traffic from local zone
     echo 'DNS(ACCEPT) loc $FW' > /etc/shorewall/conf.d/dns-${FQDN}.conf
+    echo 'DNS(ACCEPT) dmz $FW' >> /etc/shorewall/conf.d/dns-${FQDN}.conf
     echo 'DNS(ACCEPT) net $FW' >> /etc/shorewall/conf.d/dns-${FQDN}.conf
     dns-regen
 }
@@ -158,10 +212,14 @@ function install_tftpd()
 function configure_debian_installer()
 {
     echo 'TFTP(ACCEPT) loc $FW' > /etc/shorewall/conf.d/tftpd-${FQDN}.conf
+    echo 'TFTP(ACCEPT) dmz $FW' >> /etc/shorewall/conf.d/tftpd-${FQDN}.conf
     # Basic preseed setup
     apt-get ${APT_OPTIONS} install openbsd-inetd
     apt-get ${APT_OPTIONS} install micro-httpd
     echo 'Web(ACCEPT) loc $FW' > /etc/shorewall/conf.d/web-${FQDN}.conf
+    echo 'Web(ACCEPT) dmz $FW' >> /etc/shorewall/conf.d/web-${FQDN}.conf
+    echo 'Web(ACCEPT) dmz net' > /etc/shorewall/conf.d/web-client-dmz.conf
+    echo 'Web(ACCEPT) dmz loc' >> /etc/shorewall/conf.d/web-client-dmz.conf
     touch /var/www/index.html
     cp preseed.txt puppet.conf /var/www/
     perl -pi.bak -E "s/__FQDN__/${FQDN}/g" /var/www/preseed.txt
@@ -184,6 +242,7 @@ FUNCTION_LIST="
     install_netaddr
     get_netvalues
     configure_eth1
+    configure_eth2
     install_shorewall
     configure_shorewall
     install_system_database
