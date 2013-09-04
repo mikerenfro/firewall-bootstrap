@@ -26,7 +26,7 @@ Installation:
   3. tar --strip-components=1 -zxvpf firewall-bootstrap.tgz
   4. Edit support files as needed. bootstrap contains an upstream DNS entry,
      an IP range for DHCP leases, plus the IP addresses and CIDR netmasks for
-     eth1 and eth2 (currently untested for values other than 24). mirror-netboot
+     eth1 and eth2 (currently untested for values other than 25). mirror-netboot
      contains the URL to a Debian mirror.
   5. ./bootstrap
 
