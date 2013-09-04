@@ -22,7 +22,7 @@ Assumptions:
 Installation:
 
   1. mkdir (target); cd (target)
-  2. wget -O firewall-bootstrap.tgz https://github.com/mikerenfro/firewall-bootstrap/tarball/dmz
+  2. wget -O firewall-bootstrap.tgz https://github.com/mikerenfro/firewall-bootstrap/tarball/master
   3. tar --strip-components=1 -zxvpf firewall-bootstrap.tgz
   4. Edit support files as needed. bootstrap contains an upstream DNS entry,
      an IP range for DHCP leases, plus the IP addresses and CIDR netmasks for
