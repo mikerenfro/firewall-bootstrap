@@ -98,7 +98,7 @@ function configure_shorewall()
     	    /etc/shorewall/conf.d/web-client-${FQDN}.conf
     	echo 'Web(ACCEPT) $FW dmz ' >> \
     	    /etc/shorewall/conf.d/web-client-${FQDN}.conf
-    	echo 'ACCEPT $FW dmz tcp 8140' > \
+    	echo 'ACCEPT $FW loc tcp 8140' > \
     	    /etc/shorewall/conf.d/puppet-agent-${FQDN}.conf
     	echo '# Sample rule file for shorewall' > \
     	    /etc/shorewall/conf.d/example-${FQDN}.conf
