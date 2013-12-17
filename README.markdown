@@ -10,7 +10,7 @@ Currently uses:
 
 Assumptions:
 
-  * Debian 7.1 (wheezy) installed with correct hostname and domain already
+  * Debian 7.3 (wheezy) installed with correct hostname and domain already
     set
   * eth0 is the Internet-facing interface, eth1 is the internal interface,
     eth2 is the DMZ interface
@@ -22,13 +22,14 @@ Assumptions:
 Installation:
 
   1. mkdir (target); cd (target)
-  2. wget -O firewall-bootstrap.tgz https://github.com/mikerenfro/firewall-bootstrap/tarball/master
-  3. tar --strip-components=1 -zxvpf firewall-bootstrap.tgz
-  4. Edit support files as needed. bootstrap contains an upstream DNS entry,
+  2. apt-get -y install ca-certificates
+  3. wget -O firewall-bootstrap.tgz https://github.com/mikerenfro/firewall-bootstrap/tarball/master
+  4. tar --strip-components=1 -zxvpf firewall-bootstrap.tgz
+  5. Edit support files as needed. bootstrap contains an upstream DNS entry,
      an IP range for DHCP leases, plus the IP addresses and CIDR netmasks for
      eth1 and eth2 (currently untested for values other than 25). mirror-netboot
      contains the URL to a Debian mirror.
-  5. ./bootstrap
+  6. ./bootstrap
 
 Post-installation:
 
