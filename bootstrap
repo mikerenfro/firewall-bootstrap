@@ -22,11 +22,6 @@ function install_netaddr()
     apt-get ${APT_OPTIONS} install python-netaddr
 }
 
-function install_lsb_release()
-{
-    apt-get ${APT_OPTIONS} install lsb_release
-}
-
 function get_netvalues() {
     ETH1_NETMASK=`./netcalc.py netmask ${ETH1_IP}/${ETH1_NETMASK_SHORT}`
     ETH1_NETWORK=`./netcalc.py network ${ETH1_IP}/${ETH1_NETMASK_SHORT}`
@@ -245,7 +240,6 @@ BASEDIR=`dirname $0`
 cd ${BASEDIR}
 FUNCTION_LIST="
     install_netaddr
-    install_lsb_release
     get_netvalues
     configure_eth1
     configure_eth2
