@@ -94,17 +94,15 @@ EOF
     	# Local shorewall rules separated out from default settings
     	echo '# Sample rule file for shorewall' > \
     	    /etc/shorewall/conf.d/example-${FQDN}.conf
-    	echo 'Web(ACCEPT) $FW ${ETH0_ZONE} ' > \
+    	echo "Web(ACCEPT) \$FW ${ETH0_ZONE}" > \
     	    /etc/shorewall/conf.d/web-client-${FQDN}.conf
-    	echo 'Web(ACCEPT) $FW ${ETH1_ZONE} ' >> \
+    	echo "Web(ACCEPT) \$FW ${ETH1_ZONE}" >> \
     	    /etc/shorewall/conf.d/web-client-${FQDN}.conf
-    	echo 'ACCEPT $FW ${ETH1_ZONE} tcp 8140' > \
+    	echo "ACCEPT \$FW ${ETH1_ZONE} tcp 8140" > \
     	    /etc/shorewall/conf.d/puppet-agent-${FQDN}.conf
-    	echo '# Sample rule file for shorewall' > \
-    	    /etc/shorewall/conf.d/example-${FQDN}.conf
-		if [ "${MASQ_ETH1_VIA_ETH0}" -eq "true" ]; then
+		if [ "${MASQ_ETH1_VIA_ETH0}" == "true" ]; then
 		    :
-		elif [ "${MASQ_ETH1_VIA_ETH0}" -eq "false" ]; then
+		elif [ "${MASQ_ETH1_VIA_ETH0}" == "false" ]; then
             mv /etc/shorewall/masq /etc/shorewall/masq.bak
             echo "# Renamed masq file out of the way -- it's saved in masq.bak" \
                 > /etc/shorewall/masq
