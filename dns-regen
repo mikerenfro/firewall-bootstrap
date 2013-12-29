@@ -2,11 +2,9 @@
 
 # See http://www.cymru.com/Documents/secure-bind-template.html for more
 
-from system_database import SYSTEM_DATABASE_LOC, SYSTEM_DATABASE_DMZ
-from system_database import DEFAULT_DOMAIN, LOC_NETWORK_PREFIX
-from system_database import LOC_NETWORK, LOC_NETMASK_SHORT
-from system_database import DMZ_NETWORK_PREFIX
-from system_database import DMZ_NETWORK, DMZ_NETMASK_SHORT
+from system_database import SYSTEM_DATABASE
+from system_database import DEFAULT_DOMAIN, NETWORK_PREFIX
+from system_database import NETWORK, NETMASK_SHORT
 import string, os, socket
 from datetime import date
 import netaddr
@@ -66,8 +64,7 @@ CONF_FILE_CONTENT="""
 
 acl "xfer" { none; };
 acl "trusted" { localhost;
-                __LOC_NETWORK__/__LOC_NETMASK_SHORT__;
-                __DMZ_NETWORK__/__DMZ_NETMASK_SHORT__; };
+                __NETWORK__/__NETMASK_SHORT__; };
 
 view "internal-in" in {
     match-clients { trusted; }; 
@@ -155,15 +152,7 @@ def main():
         DNS_FORWARD_PREAMBLE = DNS_FORWARD_PREAMBLE.replace("__N__",
                                                             newSerial)
         forward.write(DNS_FORWARD_PREAMBLE)
-        for entry in SYSTEM_DATABASE_LOC:
-            hostname, mac, ip = ( entry['host'],
-                                  entry['mac'],
-                                  entry['ip'] )
-            forward.write(DNS_FORWARD_LINE % (hostname, ip))
-            if 'aliases' in entry:
-                for alias in entry['aliases']:
-                    forward.write(DNS_CNAME_LINE % (alias, hostname))
-        for entry in SYSTEM_DATABASE_DMZ:
+        for entry in SYSTEM_DATABASE:
             hostname, mac, ip = ( entry['host'],
                                   entry['mac'],
                                   entry['ip'] )
@@ -174,8 +163,7 @@ def main():
 
         forward.write(DNS_FORWARD_POSTAMBLE)
 
-    LOC_CIDR="%s/%s" % (LOC_NETWORK, LOC_NETMASK_SHORT)
-    DMZ_CIDR="%s/%s" % (DMZ_NETWORK, DMZ_NETMASK_SHORT)
+    CIDR="%s/%s" % (NETWORK, NETMASK_SHORT)
     TOTAL_CIDR = str(netaddr.cidr_merge([LOC_CIDR, DMZ_CIDR])[0])
     (DEFAULT_NETWORK, DEFAULT_NETMASK_SHORT) = TOTAL_CIDR.split('/')
     DEFAULT_NETWORK_PREFIX = string.join(DEFAULT_NETWORK.split('.')[0:3],'.')
@@ -188,14 +176,7 @@ def main():
         DNS_REVERSE_PREAMBLE = DNS_REVERSE_PREAMBLE.replace("__N__",
                                                             newSerial)
         reverse.write(DNS_REVERSE_PREAMBLE)
-        for entry in SYSTEM_DATABASE_LOC:
-            hostname, mac, ip = ( entry['host'],
-                                  entry['mac'],
-                                  entry['ip'] )
-            (_, _, _, lastOctet) = ip.split('.',4)
-            reverse.write(DNS_REVERSE_LINE % (lastOctet, hostname,
-                                              DEFAULT_DOMAIN))
-        for entry in SYSTEM_DATABASE_DMZ:
+        for entry in SYSTEM_DATABASE:
             hostname, mac, ip = ( entry['host'],
                                   entry['mac'],
                                   entry['ip'] )
@@ -206,7 +187,7 @@ def main():
         
     conf_file = "/etc/bind/named.conf.local"
     CONF_FILE_CONTENT = CONF_FILE_CONTENT.replace("__DOMAIN__",DEFAULT_DOMAIN)
-    CONF_FILE_CONTENT = CONF_FILE_CONTENT.replace("__LOC_NETWORK__",LOC_NETWORK)
+    CONF_FILE_CONTENT = CONF_FILE_CONTENT.replace("__NETWORK__",LOC_NETWORK)
     CONF_FILE_CONTENT = CONF_FILE_CONTENT.replace("__LOC_NETMASK_SHORT__",LOC_NETMASK_SHORT)
     CONF_FILE_CONTENT = CONF_FILE_CONTENT.replace("__DMZ_NETWORK__",DMZ_NETWORK)
     CONF_FILE_CONTENT = CONF_FILE_CONTENT.replace("__DMZ_NETMASK_SHORT__",DMZ_NETMASK_SHORT)

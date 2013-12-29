@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from system_database import SYSTEM_DATABASE_LOC, SYSTEM_DATABASE_DMZ, DEFAULT_DOMAIN
+from system_database import SYSTEM_DATABASE, DEFAULT_DOMAIN
 import string, os, socket
 
 FQDN=socket.getfqdn()
@@ -22,12 +22,6 @@ subnet __ETH1_NETWORK__ netmask __ETH1_NETMASK__ {
   option broadcast-address __ETH1_BROADCAST__;
   next-server __ETH1_IP__;
 }
-subnet __ETH2_NETWORK__ netmask __ETH2_NETMASK__ {
-  range __ETH2_DHCP_START__ __ETH2_DHCP_END__;
-  option routers __ETH2_IP__;
-  option broadcast-address __ETH2_BROADCAST__;
-  next-server __ETH2_IP__;
-}
 """
 DHCP_HOST_LINE="""host %s
   { hardware ethernet %s;
@@ -41,11 +35,6 @@ def main():
     with open('/etc/dhcp/dhcpd.conf','w') as dhcpd_conf:
         dhcpd_conf.write(DHCP_PREAMBLE)
         for entry in SYSTEM_DATABASE_LOC:
-            hostname, mac, ip = ( entry['host'],
-                                  entry['mac'],
-                                  entry['ip'] )
-            dhcpd_conf.write(DHCP_HOST_LINE % (hostname, mac, ip))
-        for entry in SYSTEM_DATABASE_DMZ:
             hostname, mac, ip = ( entry['host'],
                                   entry['mac'],
                                   entry['ip'] )
