@@ -132,9 +132,9 @@ function install_system_database()
         s/__DOMAIN__/${DOMAIN}/g;
         s/__ETH1_MAC__/${ETH1_MAC}/g;
         s/__ETH1_IP__/${ETH1_IP}/g;
-        s/__LOC_NETWORK__/${ETH1_NETWORK}/g;
-        s/__LOC_NETWORK_PREFIX__/${ETH1_NETWORK_PREFIX}/g;
-        s/__LOC_NETMASK_SHORT__/${ETH1_NETMASK_SHORT}/g;" \
+        s/__ETH1_NETWORK__/${ETH1_NETWORK}/g;
+        s/__ETH1_NETWORK_PREFIX__/${ETH1_NETWORK_PREFIX}/g;
+        s/__ETH1_NETMASK_SHORT__/${ETH1_NETMASK_SHORT}/g;" \
         /usr/local/lib/python2.7/dist-packages/system_database.py
 }
 
