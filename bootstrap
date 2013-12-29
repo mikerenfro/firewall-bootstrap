@@ -204,11 +204,11 @@ function install_tftpd()
 
 function configure_debian_installer()
 {
-    echo 'TFTP(ACCEPT) loc $FW' > /etc/shorewall/conf.d/tftpd-${FQDN}.conf
+    echo "TFTP(ACCEPT) ${ETH1_ZONE} \$FW" > /etc/shorewall/conf.d/tftpd-${FQDN}.conf
     # Basic preseed setup
     apt-get ${APT_OPTIONS} install openbsd-inetd
     apt-get ${APT_OPTIONS} install micro-httpd
-    echo 'Web(ACCEPT) loc $FW' > /etc/shorewall/conf.d/web-${FQDN}.conf
+    echo "Web(ACCEPT) ${ETH1_ZONE} \$FW" > /etc/shorewall/conf.d/web-${FQDN}.conf
     touch /var/www/index.html
     cp preseed.txt puppet.conf /var/www/
     perl -pi.bak -E "s/__FQDN__/${FQDN}/g" /var/www/preseed.txt
