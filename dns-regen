@@ -78,7 +78,7 @@ view "internal-in" in {
         };
     zone "__NETWORK_REVERSED__.in-addr.arpa" {
         type master;
-        file "/etc/bind/db.__DEFAULT_NETWORK_PREFIX__";
+        file "/etc/bind/db.__NETWORK_PREFIX__";
         };
     include "/etc/bind/named.conf.default-zones";
 };
@@ -100,7 +100,7 @@ view "external-in" in {
         };
     zone "__NETWORK_REVERSED__.in-addr.arpa" {
         type master;
-        file "/etc/bind/db.__DEFAULT_NETWORK_PREFIX__";
+        file "/etc/bind/db.__NETWORK_PREFIX__";
         allow-query { any; };
         };
 }; 
@@ -184,15 +184,10 @@ def main():
         
     conf_file = "/etc/bind/named.conf.local"
     CONF_FILE_CONTENT = CONF_FILE_CONTENT.replace("__DOMAIN__",DEFAULT_DOMAIN)
-    CONF_FILE_CONTENT = CONF_FILE_CONTENT.replace("__NETWORK__",LOC_NETWORK)
-    CONF_FILE_CONTENT = CONF_FILE_CONTENT.replace("__LOC_NETMASK_SHORT__",LOC_NETMASK_SHORT)
-    CONF_FILE_CONTENT = CONF_FILE_CONTENT.replace("__DMZ_NETWORK__",DMZ_NETWORK)
-    CONF_FILE_CONTENT = CONF_FILE_CONTENT.replace("__DMZ_NETMASK_SHORT__",DMZ_NETMASK_SHORT)
-    CONF_FILE_CONTENT = CONF_FILE_CONTENT.replace("__DOMAIN__",DEFAULT_DOMAIN)
+    CONF_FILE_CONTENT = CONF_FILE_CONTENT.replace("__NETWORK__",NETWORK)
+    CONF_FILE_CONTENT = CONF_FILE_CONTENT.replace("__NETMASK_SHORT__",NETMASK_SHORT)
     CONF_FILE_CONTENT = CONF_FILE_CONTENT.replace("__NETWORK_REVERSED__",reverseNetwork)
-    CONF_FILE_CONTENT = CONF_FILE_CONTENT.replace("__DEFAULT_NETWORK_PREFIX__",DEFAULT_NETWORK_PREFIX)
-    CONF_FILE_CONTENT = CONF_FILE_CONTENT.replace("__DEFAULT_NETWORK__",DEFAULT_NETWORK)
-    CONF_FILE_CONTENT = CONF_FILE_CONTENT.replace("__NETMASK_SHORT__",DEFAULT_NETMASK_SHORT)
+    CONF_FILE_CONTENT = CONF_FILE_CONTENT.replace("__NETWORK_PREFIX__",NETWORK_PREFIX)
     with open(conf_file,'w') as conf:
         conf.write(CONF_FILE_CONTENT)
 
