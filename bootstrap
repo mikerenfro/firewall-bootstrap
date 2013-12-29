@@ -5,6 +5,8 @@ ETH1_IP="192.168.0.1"
 ETH1_NETMASK_SHORT="25" # CIDR notation
 ETH1_DHCP_START="100"
 ETH1_DHCP_END="126"
+MASQ_ETH1_VIA_ETH0="true" # or false
+PXE_ARCH="amd64" # or i386
 UPSTREAM_DNS="8.8.8.8"
 
 # Should be no need to edit past this point
@@ -100,9 +102,16 @@ EOF
     	    /etc/shorewall/conf.d/puppet-agent-${FQDN}.conf
     	echo '# Sample rule file for shorewall' > \
     	    /etc/shorewall/conf.d/example-${FQDN}.conf
-        mv /etc/shorewall/masq /etc/shorewall/masq.bak
-        echo "# Renamed masq file out of the way -- it's saved in masq.bak" \
-            > /etc/shorewall/masq
+		if [ "${MASQ_ETH1_VIA_ETH0}" -eq "true" ]; then
+		    :
+		elif [ "${MASQ_ETH1_VIA_ETH0}" -eq "false" ]; then
+            mv /etc/shorewall/masq /etc/shorewall/masq.bak
+            echo "# Renamed masq file out of the way -- it's saved in masq.bak" \
+                > /etc/shorewall/masq
+		else
+		    echo "MASQ_ETH1_VIA_ETH0 should be 'true' or 'false' in bootstrap."
+			echo "Leaving /etc/shorewall/masq unmodified."
+		fi
 
     	# Shorewall starts by default
     	perl -pi.bak -E "s/^startup=0/startup=1/g" /etc/default/shorewall
@@ -207,7 +216,7 @@ function configure_debian_installer()
     cp mirror-netboot /usr/local/sbin
     mirror-netboot
     # Optional: ensure that the default netboot option exists
-    ( cd /srv/tftp/pxelinux.cfg && ln -s debian-installer-i386 default )
+    ( cd /srv/tftp/pxelinux.cfg && ln -s debian-installer-${PXE_ARCH} default )
     cp puppet.default /var/www/
 }
 
