@@ -59,25 +59,25 @@ function configure_shorewall()
     	#grep -q "^${ETH1_ZONE}.*dhcp.*" /etc/shorewall/interfaces || \
     	#    perl -pi.bak.bak -E "s/${ETH1_ZONE} (.*)/${ETH1_ZONE} \$1,dhcp/g" \
     	#    /etc/shorewall/interfaces
-	    cat >> /etc/shorewall/interfaces <<EOF
+	    cat > /etc/shorewall/interfaces <<EOF
 ${ETH0_ZONE} eth0 tcpflags,dhcp,nosmurfs,routefilter,logmartians,sourceroute=0
 ${ETH1_ZONE} eth1 tcpflags,dhcp,nosmurfs,routefilter,logmartians
 EOF
         # Define default policy
-	    cat >> /etc/shorewall/policy <<EOF
+	    cat > /etc/shorewall/policy <<EOF
 ${ETH1_ZONE}	${ETH0_ZONE}	ACCEPT
 ${ETH0_ZONE}	all	DROP	info
 all	all	REJECT	info
 EOF
         # Define default zones
-	    cat >> /etc/shorewall/zones <<EOF
+	    cat > /etc/shorewall/zones <<EOF
 fw	firewall
 ${ETH0_ZONE}	ipv4
 ${ETH1_ZONE}	ipv4
 EOF
         # Define default rules
     	mkdir -p /etc/shorewall/conf.d
-	    cat >> /etc/shorewall/rules <<EOF
+	    cat > /etc/shorewall/rules <<EOF
 SECTION NEW
 Invalid(DROP)	${ETH0_ZONE}	all
 DNS(ACCEPT)	\$FW	${ETH0_ZONE}
