@@ -163,14 +163,11 @@ def main():
 
         forward.write(DNS_FORWARD_POSTAMBLE)
 
-    CIDR="%s/%s" % (NETWORK, NETMASK_SHORT)
-    TOTAL_CIDR = str(netaddr.cidr_merge([LOC_CIDR, DMZ_CIDR])[0])
-    (DEFAULT_NETWORK, DEFAULT_NETMASK_SHORT) = TOTAL_CIDR.split('/')
-    DEFAULT_NETWORK_PREFIX = string.join(DEFAULT_NETWORK.split('.')[0:3],'.')
-    networkFields = DEFAULT_NETWORK_PREFIX.split('.')
+    NETWORK_PREFIX = string.join(NETWORK.split('.')[0:3],'.')
+    networkFields = NETWORK_PREFIX.split('.')
     networkFields.reverse()
     reverseNetwork = string.join(networkFields,'.')
-    reverse_file = "/etc/bind/db.%s" % (DEFAULT_NETWORK_PREFIX)
+    reverse_file = "/etc/bind/db.%s" % (NETWORK_PREFIX)
     with open(reverse_file,'w') as reverse:
         # print DNS_REVERSE_PREAMBLE
         DNS_REVERSE_PREAMBLE = DNS_REVERSE_PREAMBLE.replace("__N__",
