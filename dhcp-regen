@@ -34,7 +34,7 @@ DHCP_PREAMBLE = DHCP_PREAMBLE.replace('~LOCAL_DOMAIN~',DEFAULT_DOMAIN)
 def main():
     with open('/etc/dhcp/dhcpd.conf','w') as dhcpd_conf:
         dhcpd_conf.write(DHCP_PREAMBLE)
-        for entry in SYSTEM_DATABASE_LOC:
+        for entry in SYSTEM_DATABASE:
             hostname, mac, ip = ( entry['host'],
                                   entry['mac'],
                                   entry['ip'] )
