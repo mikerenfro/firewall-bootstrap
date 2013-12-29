@@ -62,6 +62,7 @@ function configure_shorewall()
     	#    perl -pi.bak.bak -E "s/${ETH1_ZONE} (.*)/${ETH1_ZONE} \$1,dhcp/g" \
     	#    /etc/shorewall/interfaces
 	    cat > /etc/shorewall/interfaces <<EOF
+FORMAT 2
 ${ETH0_ZONE} eth0 tcpflags,dhcp,nosmurfs,routefilter,logmartians,sourceroute=0
 ${ETH1_ZONE} eth1 tcpflags,dhcp,nosmurfs,routefilter,logmartians
 EOF
